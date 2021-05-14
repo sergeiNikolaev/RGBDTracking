@@ -217,14 +217,9 @@ public:
 };
 
 
-/*#if defined(SOFA_EXTERN_TEMPLATE) && !defined(RegistrationRigid_CPP)
-#ifndef SOFA_FLOAT
-extern template class SOFA_RGBDTRACKING_API RegistrationRigid<defaulttype::Vec3dTypes>;
+#if defined(SOFA_EXTERN_TEMPLATE) && !defined(RegistrationRigid_CPP)
+extern template class SOFA_RGBDTRACKING_API RegistrationRigid<defaulttype::Vec3Types>;
 #endif
-#ifndef SOFA_DOUBLE
-extern template class SOFA_RGBDTRACKING_API RegistrationRigid<defaulttype::Vec3fTypes>;
-#endif
-#endif*/
 
 
 //

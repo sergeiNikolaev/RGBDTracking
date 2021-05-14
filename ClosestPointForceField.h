@@ -317,14 +317,9 @@ public:
 };
 
 
-/*#if defined(SOFA_EXTERN_TEMPLATE) && !defined(ClosestPointForceField_CPP)
-#ifndef SOFA_FLOAT
-extern template class SOFA_RGBDTRACKING_API ClosestPointForceField<defaulttype::Vec3dTypes>;
+#if defined(SOFA_EXTERN_TEMPLATE) && !defined(ClosestPointForceField_CPP)
+extern template class SOFA_RGBDTRACKING_API ClosestPointForceField<defaulttype::Vec3Types>;
 #endif
-#ifndef SOFA_DOUBLE
-extern template class SOFA_RGBDTRACKING_API ClosestPointForceField<defaulttype::Vec3fTypes>;
-#endif
-#endif*/
 
 
 } //

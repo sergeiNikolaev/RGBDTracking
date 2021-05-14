@@ -45,36 +45,23 @@ namespace objectmodel
 
     using namespace sofa::defaulttype;
 
-      SOFA_DECL_CLASS(ImageConverter)
+    SOFA_DECL_CLASS(ImageConverter)
 
-      // Register in the Factory
-      int ImageConverterClass = core::RegisterObject("Compute forces based on closest points from/to a target surface/point set")
-    #ifndef SOFA_FLOAT
-        .add< ImageConverter<Vec3dTypes,ImageUC> >()
-        .add< ImageConverter<Vec3dTypes,ImageUS> >()
-        .add< ImageConverter<Vec3dTypes,ImageF> >()
-    #endif
-    #ifndef SOFA_DOUBLE
-        .add< ImageConverter<Vec3fTypes,ImageUC> >()
-        .add< ImageConverter<Vec3fTypes,ImageUS> >()
-        .add< ImageConverter<Vec3fTypes,ImageF> >()
-    #endif
+    // Register in the Factory
+    int ImageConverterClass = core::RegisterObject("Compute forces based on closest points from/to a target surface/point set")
+    .add< ImageConverter<Vec3Types,ImageUC> >()
+    .add< ImageConverter<Vec3Types,ImageUS> >()
+    .add< ImageConverter<Vec3Types,ImageF> >()
     ;
 
-    #ifndef SOFA_FLOAT
-      template class SOFA_RGBDTRACKING_API ImageConverter<Vec3dTypes,ImageUC>;
-      template class SOFA_RGBDTRACKING_API ImageConverter<Vec3dTypes,ImageUS>;
-      template class SOFA_RGBDTRACKING_API ImageConverter<Vec3dTypes,ImageF>;
-    #endif
-    #ifndef SOFA_DOUBLE
-      template class SOFA_RGBDTRACKING_API ImageConverter<Vec3fTypes,ImageUC>;
-      template class SOFA_RGBDTRACKING_API ImageConverter<Vec3fTypes,ImageUS>;
-      template class SOFA_RGBDTRACKING_API ImageConverter<Vec3fTypes,ImageF>;
-    #endif
-
+    template class SOFA_RGBDTRACKING_API ImageConverter<Vec3Types,ImageUC>;
+    template class SOFA_RGBDTRACKING_API ImageConverter<Vec3Types,ImageUS>;
+    template class SOFA_RGBDTRACKING_API ImageConverter<Vec3Types,ImageF>;
 
 }
+
 }
+
 } // namespace sofa
 
 

@@ -42,24 +42,14 @@ namespace objectmodel
 
     using namespace sofa::defaulttype;
 
-      SOFA_DECL_CLASS(ClosestPoint)
+    SOFA_DECL_CLASS(ClosestPoint)
 
-      // Register in the Factory
-      int ClosestPointClass = core::RegisterObject("Compute forces based on closest points from/to a target surface/point set")
-    #ifndef SOFA_FLOAT
-        .add< ClosestPoint<Vec3dTypes> >()
-    #endif
-    #ifndef SOFA_DOUBLE
-        .add< ClosestPoint<Vec3fTypes> >()
-    #endif
+    // Register in the Factory
+    int ClosestPointClass = core::RegisterObject("Compute forces based on closest points from/to a target surface/point set")
+    .add< ClosestPoint<Vec3Types> >()
     ;
 
-    #ifndef SOFA_FLOAT
-      template class SOFA_RGBDTRACKING_API ClosestPoint<Vec3dTypes>;
-    #endif
-    #ifndef SOFA_DOUBLE
-      template class SOFA_RGBDTRACKING_API ClosestPoint<Vec3fTypes>;
-    #endif
+    template class SOFA_RGBDTRACKING_API ClosestPoint<Vec3Types>;
 
 using namespace helper;
 

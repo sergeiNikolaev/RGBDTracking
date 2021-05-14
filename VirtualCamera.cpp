@@ -58,29 +58,20 @@ namespace objectmodel
 {
     using namespace sofa::defaulttype;
 
-      SOFA_DECL_CLASS(VirtualCamera)
+    SOFA_DECL_CLASS(VirtualCamera)
 
-      // Register in the Factory
-      int VirtualCameraClass = core::RegisterObject("Compute forces based on closest points from/to a target surface/point set")
-    #ifndef SOFA_FLOAT
-        .add< VirtualCamera<Vec3dTypes> >()
-    #endif
-    #ifndef SOFA_DOUBLE
-        .add< VirtualCamera<Vec3fTypes> >()
-    #endif
+    // Register in the Factory
+    int VirtualCameraClass = core::RegisterObject("Compute forces based on closest points from/to a target surface/point set")
+    .add< VirtualCamera<Vec3Types> >()
     ;
 
-    #ifndef SOFA_FLOAT
-      template class SOFA_RGBDTRACKING_API VirtualCamera<Vec3dTypes>;
-    #endif
-    #ifndef SOFA_DOUBLE
-      template class SOFA_RGBDTRACKING_API VirtualCamera<Vec3fTypes>;
-
-    #endif
+    template class SOFA_RGBDTRACKING_API VirtualCamera<Vec3Types>;
 
 using namespace helper;
 
 }
+
 }
+
 } // namespace sofa
 

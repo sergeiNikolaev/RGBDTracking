@@ -55,20 +55,10 @@ namespace forcefield
 
     // Register in the Factory
     int ClosestPointForceFieldForKalmanFilterClass = core::RegisterObject("Compute forces based on closest points from/to a target surface/point set")
-    #ifndef SOFA_FLOAT
-        .add< ClosestPointForceFieldForKalmanFilter<Vec3dTypes> >()
-    #endif
-    #ifndef SOFA_DOUBLE
-        .add< ClosestPointForceFieldForKalmanFilter<Vec3fTypes> >()
-    #endif
+    .add< ClosestPointForceFieldForKalmanFilter<Vec3Types> >()
     ;
 
-    #ifndef SOFA_FLOAT
-      template class SOFA_RGBDTRACKING_API ClosestPointForceFieldForKalmanFilter<Vec3dTypes>;
-    #endif
-    #ifndef SOFA_DOUBLE
-      template class SOFA_RGBDTRACKING_API ClosestPointForceFieldForKalmanFilter<Vec3fTypes>;
-    #endif
+    template class SOFA_RGBDTRACKING_API ClosestPointForceFieldForKalmanFilter<Vec3Types>;
 
 using namespace helper;
 

@@ -149,12 +149,7 @@ public:
 
 
 #if defined(SOFA_EXTERN_TEMPLATE) && !defined(RenderTextureAR_CPP)
-#ifndef SOFA_FLOAT
-extern template class SOFA_RGBDTRACKING_API RenderTextureAR<defaulttype::Vec3dTypes>;
-#endif
-#ifndef SOFA_DOUBLE
-extern template class SOFA_RGBDTRACKING_API RenderTextureAR<defaulttype::Vec3fTypes>;
-#endif
+extern template class SOFA_RGBDTRACKING_API RenderTextureAR<defaulttype::Vec3Types>;
 #endif
 
 

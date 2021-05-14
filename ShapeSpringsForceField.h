@@ -156,20 +156,10 @@ private :
 #if defined(SOFA_EXTERN_TEMPLATE) && !defined(SOFA_RGBDTRACKING_SHAPESPRINGSFORCEFIELD_CPP)
 
 using namespace sofa::defaulttype;
-
-#ifndef SOFA_FLOAT
-extern template class SOFA_RGBDTRACKING_API ShapeSpringsForceField<Vec3dTypes>;
-//extern template class SOFA_RGBDTRACKING_API ShapeSpringsForceField<Vec2dTypes>;
-extern template class SOFA_RGBDTRACKING_API ShapeSpringsForceField<Vec1dTypes>;
-//extern template class SOFA_RGBDTRACKING_APIAPI ShapeSpringsForceField<Vec6dTypes>;
-#endif
-#ifndef SOFA_DOUBLE
-extern template class SOFA_RGBDTRACKING_API ShapeSpringsForceField<Vec3fTypes>;
-//extern template class SOFA_RGBDTRACKING_API ShapeSpringsForceField<Vec2fTypes>;
-extern template class SOFA_RGBDTRACKING_API ShapeSpringsForceField<Vec1fTypes>;
-//extern template class SOFA_RGBDTRACKING_API ShapeSpringsForceField<Vec6fTypes>;
-#endif
-
+extern template class SOFA_RGBDTRACKING_API ShapeSpringsForceField<Vec3Types>;
+//extern template class SOFA_RGBDTRACKING_API ShapeSpringsForceField<Vec2Types>;
+extern template class SOFA_RGBDTRACKING_API ShapeSpringsForceField<Vec1Types>;
+//extern template class SOFA_RGBDTRACKING_APIAPI ShapeSpringsForceField<Vec6Types>;
 #endif // defined(SOFA_EXTERN_TEMPLATE) && !defined(SOFA_RGBDTRACKING_SHAPESPRINGSFORCEFIELD_CPP)
 
 } // namespace forcefield

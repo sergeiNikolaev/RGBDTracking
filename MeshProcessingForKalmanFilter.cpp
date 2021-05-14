@@ -61,27 +61,18 @@ namespace objectmodel
 
     SOFA_DECL_CLASS(MeshProcessingForKalmanFilter)
 
-      // Register in the Factory
-      int MeshProcessingForKalmanFilterClass = core::RegisterObject("Compute forces based on closest points from/to a target surface/point set")
-    #ifndef SOFA_FLOAT
-        .add< MeshProcessingForKalmanFilter<Vec3dTypes> >()
-    #endif
-    #ifndef SOFA_DOUBLE
-        .add< MeshProcessingForKalmanFilter<Vec3fTypes> >()
-    #endif
+    // Register in the Factory
+    int MeshProcessingForKalmanFilterClass = core::RegisterObject("Compute forces based on closest points from/to a target surface/point set")
+    .add< MeshProcessingForKalmanFilter<Vec3Types> >()
     ;
 
-    #ifndef SOFA_FLOAT
-      template class SOFA_RGBDTRACKING_API MeshProcessingForKalmanFilter<Vec3dTypes>;
-    #endif
-    #ifndef SOFA_DOUBLE
-      template class SOFA_RGBDTRACKING_API MeshProcessingForKalmanFilter<Vec3fTypes>;
-
-    #endif
+    template class SOFA_RGBDTRACKING_API MeshProcessingForKalmanFilter<Vec3Types>;
 
 using namespace helper;
 
 }
+
 }
+
 } // namespace sofa
 

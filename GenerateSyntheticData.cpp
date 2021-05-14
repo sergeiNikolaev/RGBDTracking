@@ -122,34 +122,21 @@ namespace forcefield
 
     using namespace sofa::defaulttype;
 
-      SOFA_DECL_CLASS(GenerateSyntheticData)
+    SOFA_DECL_CLASS(GenerateSyntheticData)
 
-      // Register in the Factory
-      int GenerateSyntheticDataClass = core::RegisterObject("Compute forces based on closest points from/to a target surface/point set")
-    #ifndef SOFA_FLOAT
-        .add< GenerateSyntheticData<Vec3dTypes,ImageUC> >()
-        .add< GenerateSyntheticData<Vec3dTypes,ImageUS> >()
-        .add< GenerateSyntheticData<Vec3dTypes,ImageF> >()
-    #endif
-    #ifndef SOFA_DOUBLE
-        .add< GenerateSyntheticData<Vec3fTypes,ImageUC> >()
-        .add< GenerateSyntheticData<Vec3fTypes,ImageUS> >()
-        .add< GenerateSyntheticData<Vec3fTypes,ImageF> >()
-    #endif
+    // Register in the Factory
+    int GenerateSyntheticDataClass = core::RegisterObject("Compute forces based on closest points from/to a target surface/point set")
+    .add< GenerateSyntheticData<Vec3Types,ImageUC> >()
+    .add< GenerateSyntheticData<Vec3Types,ImageUS> >()
+    .add< GenerateSyntheticData<Vec3Types,ImageF> >()
     ;
 
-    #ifndef SOFA_FLOAT
-      template class SOFA_RGBDTRACKING_API GenerateSyntheticData<Vec3dTypes,ImageUC>;
-      template class SOFA_RGBDTRACKING_API GenerateSyntheticData<Vec3dTypes,ImageUS>;
-      template class SOFA_RGBDTRACKING_API GenerateSyntheticData<Vec3dTypes,ImageF>;
-    #endif
-    #ifndef SOFA_DOUBLE
-      template class SOFA_RGBDTRACKING_API GenerateSyntheticData<Vec3fTypes,ImageUC>;
-      template class SOFA_RGBDTRACKING_API GenerateSyntheticData<Vec3fTypes,ImageUS>;
-      template class SOFA_RGBDTRACKING_API GenerateSyntheticData<Vec3fTypes,ImageF>;
-    #endif
+    template class SOFA_RGBDTRACKING_API GenerateSyntheticData<Vec3Types,ImageUC>;
+    template class SOFA_RGBDTRACKING_API GenerateSyntheticData<Vec3Types,ImageUS>;
+    template class SOFA_RGBDTRACKING_API GenerateSyntheticData<Vec3Types,ImageF>;
 
 using namespace helper;
+
 
 template <class DataTypes, class DepthTypes>
 GenerateSyntheticData<DataTypes, DepthTypes>::GenerateSyntheticData(core::behavior::MechanicalState<DataTypes> *mm )

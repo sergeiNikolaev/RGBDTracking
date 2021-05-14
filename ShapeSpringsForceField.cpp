@@ -52,20 +52,10 @@ using namespace sofa::defaulttype;
 SOFA_DECL_CLASS(ShapeSpringsForceField)
 
 int ShapeSpringsForceFieldClass = core::RegisterObject("Simple elastic springs applied to given degrees of freedom between their current and rest shape position")
-#ifndef SOFA_FLOAT
-        .add< ShapeSpringsForceField<Vec3dTypes> >()
-#endif
-#ifndef SOFA_DOUBLE
-        .add< ShapeSpringsForceField<Vec3fTypes> >()
-#endif
-        ;
+.add< ShapeSpringsForceField<Vec3Types> >()
+;
 
-#ifndef SOFA_FLOAT
-template class SOFA_RGBDTRACKING_API ShapeSpringsForceField<Vec3dTypes>;
-#endif
-#ifndef SOFA_DOUBLE
-template class SOFA_RGBDTRACKING_API ShapeSpringsForceField<Vec3fTypes>;
-#endif
+template class SOFA_RGBDTRACKING_API ShapeSpringsForceField<Vec3Types>;
 
 
 

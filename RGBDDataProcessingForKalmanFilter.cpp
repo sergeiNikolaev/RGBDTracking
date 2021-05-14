@@ -58,29 +58,20 @@ namespace objectmodel
 {
     using namespace sofa::defaulttype;
 
-      SOFA_DECL_CLASS(RGBDDataProcessingForKalmanFilter)
+    SOFA_DECL_CLASS(RGBDDataProcessingForKalmanFilter)
 
-      // Register in the Factory
-      int RGBDDataProcessingForKalmanFilterClass = core::RegisterObject("Compute forces based on closest points from/to a target surface/point set")
-    #ifndef SOFA_FLOAT
-        .add< RGBDDataProcessingForKalmanFilter<Vec3dTypes> >()
-    #endif
-    #ifndef SOFA_DOUBLE
-        .add< RGBDDataProcessingForKalmanFilter<Vec3fTypes> >()
-    #endif
+    // Register in the Factory
+    int RGBDDataProcessingForKalmanFilterClass = core::RegisterObject("Compute forces based on closest points from/to a target surface/point set")
+    .add< RGBDDataProcessingForKalmanFilter<Vec3Types> >()
     ;
 
-    #ifndef SOFA_FLOAT
-      template class SOFA_RGBDTRACKING_API RGBDDataProcessingForKalmanFilter<Vec3dTypes>;
-    #endif
-    #ifndef SOFA_DOUBLE
-      template class SOFA_RGBDTRACKING_API RGBDDataProcessingForKalmanFilter<Vec3fTypes>;
-
-    #endif
+    template class SOFA_RGBDTRACKING_API RGBDDataProcessingForKalmanFilter<Vec3Types>;
 
 using namespace helper;
 
 }
+
 }
+
 } // namespace sofa
 

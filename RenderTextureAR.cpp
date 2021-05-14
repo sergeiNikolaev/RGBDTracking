@@ -57,29 +57,20 @@ namespace objectmodel
 {
     using namespace sofa::defaulttype;
 
-      SOFA_DECL_CLASS(RenderTextureAR)
+    SOFA_DECL_CLASS(RenderTextureAR)
 
-      // Register in the Factory
-      int RenderTextureARClass = core::RegisterObject("Compute forces based on closest points from/to a target surface/point set")
-    #ifndef SOFA_FLOAT
-        .add< RenderTextureAR<Vec3dTypes> >()
-    #endif
-    #ifndef SOFA_DOUBLE
-        .add< RenderTextureAR<Vec3fTypes> >()
-    #endif
+    // Register in the Factory
+    int RenderTextureARClass = core::RegisterObject("Compute forces based on closest points from/to a target surface/point set")
+    .add< RenderTextureAR<Vec3Types> >()
     ;
 
-    #ifndef SOFA_FLOAT
-      template class SOFA_RGBDTRACKING_API RenderTextureAR<Vec3dTypes>;
-    #endif
-    #ifndef SOFA_DOUBLE
-      template class SOFA_RGBDTRACKING_API RenderTextureAR<Vec3fTypes>;
-
-    #endif
+    template class SOFA_RGBDTRACKING_API RenderTextureAR<Vec3Types>;
 
 using namespace helper;
 
 }
+
 }
+
 } // namespace sofa
 

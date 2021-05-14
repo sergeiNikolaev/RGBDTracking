@@ -357,13 +357,7 @@ using sofa::core::RegisterObject ;
 SOFA_DECL_CLASS(ZMQCommunication)
 
 int ZMQCommunicationClass = RegisterObject("This component is used to build a communication between two simulations")
-
-//#ifdef SOFA_DOUBLE
-.add< ZMQCommunication<defaulttype::Vec3dTypes> >(true)
-//#endif
-//#ifdef SOFA_FLOAT
-.add< ZMQCommunication<defaulttype::Vec3fTypes> >()
-//#endif
+.add< ZMQCommunication<defaulttype::Vec3Types> >(true)
 ;
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -371,12 +365,7 @@ int ZMQCommunicationClass = RegisterObject("This component is used to build a co
 // This goes with the extern template declaration in the .h. Declaring extern template
 // avoid the code generation of the template for each compilation unit.
 // see: http://www.stroustrup.com/C++11FAQ.html#extern-templates
-//#ifdef SOFA_DOUBLE
-template class SOFA_RGBDTRACKING_API ZMQCommunication<defaulttype::Vec3dTypes>;
-//#endif
-//#ifdef SOFA_FLOAT
-template class SOFA_RGBDTRACKING_API ZMQCommunication<defaulttype::Vec3fTypes>;
-//#endif
+template class SOFA_RGBDTRACKING_API ZMQCommunication<defaulttype::Vec3Types>;
 
 
 //	err = p_helper_socket::socket_create_UDP_Sender(sock_sender, 6999, /*ip_recipient*/"192.168.3.29");

@@ -176,17 +176,9 @@ public:
 
 
 #if defined(SOFA_EXTERN_TEMPLATE) && !defined(ImageConverter_CPP)
-    #ifndef SOFA_FLOAT
-     extern template class SOFA_RGBDTRACKING_API ImageConverter<Vec3dTypes,ImageUC>;
-     extern template class SOFA_RGBDTRACKING_API ImageConverter<Vec3dTypes,ImageUS>;
-     extern template class SOFA_RGBDTRACKING_API ImageConverter<Vec3dTypes,ImageF>;
-    #endif
-    #ifndef SOFA_DOUBLE
-    extern template class SOFA_RGBDTRACKING_API ImageConverter<Vec3fTypes,ImageUC>;
-    extern template class SOFA_RGBDTRACKING_API ImageConverter<Vec3fTypes,ImageUS>;
-    extern template class SOFA_RGBDTRACKING_API ImageConverter<Vec3fTypes,ImageF>;
-    #endif
-
+    extern template class SOFA_RGBDTRACKING_API ImageConverter<Vec3Types,ImageUC>;
+    extern template class SOFA_RGBDTRACKING_API ImageConverter<Vec3Types,ImageUS>;
+    extern template class SOFA_RGBDTRACKING_API ImageConverter<Vec3Types,ImageF>;
 #endif
 
 
