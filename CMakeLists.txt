@@ -5,6 +5,8 @@ set(RGBDTRACKING_MAJOR_VERSION 0)
 set(RGBDTRACKING_MINOR_VERSION 1)
 set(RGBDTRACKING_VERSION ${RGBDTRACKING_MAJOR_VERSION}.${RGBDTRACKING_MINOR_VERSION})
 
+find_package(Eigen3 3.3 REQUIRED NO_MODULE)
+
 find_package(OpenCV)
 option(WITH_CUDA FALSE)
 set(HAVECUDA FALSE)
@@ -67,6 +69,14 @@ set(HEADER_FILES
         DataSource.hpp
         serialization.h
         ZMQCommunication.h
+        RGBDDataProcessingForKalmanFilter.h
+	RGBDDataProcessingForKalmanFilter.inl
+        MeshProcessingForKalmanFilter.h
+        MeshProcessingForKalmanFilter.inl
+        ClosestPointForceFieldForKalmanFilter.h
+        PointCloudSplitter.h
+        PointCloudSplitter.inl
+        ModRenderingManager.h
 )
 
 set(SOURCE_FILES
@@ -88,6 +98,11 @@ set(SOURCE_FILES
 	ShapeSpringsForceField.cpp
 	VirtualCamera.cpp
         ZMQCommunication.cpp
+        RGBDDataProcessingForKalmanFilter.cpp
+        MeshProcessingForKalmanFilter.cpp
+        ClosestPointForceFieldForKalmanFilter.cpp
+        PointCloudSplitter.cpp
+        ModRenderingManager.cpp
 )
 
 set(README_FILES rgbdtracking.txt)
@@ -178,7 +193,7 @@ if(SOFA-CUDA_CUBLAS)
     target_link_libraries(${PROJECT_NAME} ${CUDA_SPARSE_LIBRARY} ${GENCODE})
 endif()
 
-target_link_libraries(${PROJECT_NAME} ${ALL_LIBRARIES} ${Boost_FILESYSTEM_LIBRARY} ${Boost_SYSTEM_LIBRARY} image SofaGuiQt SofaMeshCollision SofaMiscCollision SofaBaseCollision SofaGuiCommon SofaBaseVisual SofaExporter SofaLoader SofaMiscForceField SofaGeneralEngine -lzmq)
+target_link_libraries(${PROJECT_NAME} ${ALL_LIBRARIES} ${Boost_FILESYSTEM_LIBRARY} ${Boost_SYSTEM_LIBRARY} Eigen3::Eigen image SofaGuiQt SofaMeshCollision SofaMiscCollision SofaBaseCollision SofaGuiCommon SofaBaseVisual SofaExporter SofaLoader SofaMiscForceField SofaGeneralEngine -lzmq)
 
 if (HAVECUDA)
 target_link_libraries(${PROJECT_NAME} ${GENCODE} ${CUDA_LIBRARIES} ${CUDA_nppi_LIBRARY})
@@ -201,8 +216,12 @@ set_target_properties(${PROJECT_NAME} PROPERTIES COMPILE_FLAGS "${RGBDTRACKING_C
 
 
 ## Install rules for the library; CMake package configurations files
-sofa_create_package(RGBDTracking ${RGBDTRACKING_VERSION} RGBDTracking RGBDTracking)
-
-
-install(DIRECTORY examples/ DESTINATION share/sofa/plugins/${PROJECT_NAME})
+sofa_create_package_with_targets(
+    PACKAGE_NAME ${PROJECT_NAME}
+    TARGETS ${PROJECT_NAME} AUTO_SET_TARGET_PROPERTIES
+    PACKAGE_VERSION ${RGBDTRACKING_VERSION}
+    RELOCATABLE "plugins"
+    )
+#sofa_create_package(RGBDTracking ${RGBDTRACKING_VERSION} RGBDTracking RGBDTracking)
+#install(DIRECTORY examples/ DESTINATION share/sofa/plugins/${PROJECT_NAME})
 

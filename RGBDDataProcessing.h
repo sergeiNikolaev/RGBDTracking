@@ -240,14 +240,17 @@ public:
     virtual ~RGBDDataProcessing();
 
     void init();
-	void handleEvent(sofa::core::objectmodel::Event *event);
-	void setRGBDData(cv::Mat &_color, cv::Mat &_depth)
-	{
-		color = _color;
-		depth = _depth;
-	}
-	
-	
+    void handleEvent(sofa::core::objectmodel::Event *event);
+    void setRGBDData(cv::Mat &_color, cv::Mat &_depth)
+    {
+        color = _color;
+        depth = _depth;
+    }
+
+    // handle mouse in case of control point selection
+    static void draw_box(cv::Mat _img, cv::Rect rect);
+    static void my_mouse_callback(int event, int x, int y, int flags, void* param);
+
     void computeTargetNormals();
     Eigen::Matrix<float,1,3>& computeJacobian(int i);
     Eigen::Matrix<float,3,3>& computeJacobianColor(int i);
@@ -270,7 +273,11 @@ public:
     void segment();
     void segmentSynth();
     void ContourFromRGBSynth(cv::Mat& rgbImage, cv::Mat& distImage, cv::Mat& dotImage);
-    void draw(const core::visual::VisualParams* vparams) ;
+    void draw(const core::visual::VisualParams* vparams);
+
+    static bool destroy;
+    static cv::Rect box;
+    static bool drawing_box;
 };
 
 

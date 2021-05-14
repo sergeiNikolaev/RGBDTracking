@@ -23,45 +23,15 @@
 * Contact information: contact@sofa-framework.org                             *
 ******************************************************************************/
 
-#ifndef SOFA_RGBDTRACKING_VIRTUALCAMERA_H
-#define SOFA_RGBDTRACKING_VIRTUALCAMERA_H
+#ifndef SOFA_RGBDTRACKING_MESHPROCESSING_FORKALMANFILTER_H
+#define SOFA_RGBDTRACKING_MESHPROCESSING_FORKALMANFILTER_H
 
-#include <RGBDTracking/config.h>
-#include <boost/thread.hpp>
+#include "MeshProcessing.inl"
+#include "MeshProcessing.h"
 
-#include <sofa/core/core.h>
-#include <sofa/core/objectmodel/BaseObject.h>
-#include <sofa/core/objectmodel/Event.h>
-#include <sofa/simulation/AnimateBeginEvent.h>
-#include <sofa/simulation/AnimateEndEvent.h>
-#include <sofa/core/behavior/MechanicalState.h>
-#include <sofa/helper/accessor.h>
-#include <sofa/defaulttype/VecTypes.h>
-#include <sofa/helper/vector.h>
-#include <sofa/defaulttype/Vec.h>
-#include <SofaBaseTopology/TopologyData.h>
-#include <sofa/gui/BaseGUI.h>
-#include <sofa/gui/BaseViewer.h>
-#include <sofa/gui/GUIManager.h>
-
-#include <set>
-
-#include <pthread.h>
-#include <stdlib.h>
-#include <vector>
-#include <iostream>
-#include <string>
-
-#include <opencv/cv.h>
-#include <opencv2/core.hpp>
-
-#include <sys/times.h>
-
-#include <Eigen/Dense>
 
 using namespace std;
 using namespace cv;
-
 
 namespace sofa
 {
@@ -78,54 +48,56 @@ using namespace sofa::component::topology;
 
 
 template<class DataTypes>
-class VirtualCameraInternalData
+class MeshProcessingForKalmanFilter : public MeshProcessing<DataTypes>
 {
 public:
-};
+    SOFA_CLASS(SOFA_TEMPLATE(MeshProcessingForKalmanFilter,DataTypes), SOFA_TEMPLATE(MeshProcessing,DataTypes));
 
-template<class DataTypes>
-class VirtualCamera : public sofa::core::objectmodel::BaseObject
-{
-public:
-    SOFA_CLASS(SOFA_TEMPLATE(VirtualCamera,DataTypes),sofa::core::objectmodel::BaseObject);
-	
-    typedef sofa::core::objectmodel::BaseObject Inherit;
+    typedef typename DataTypes::VecCoord VecCoord;
 
-    typedef sofa::defaulttype::Vector4 Vector4;
-    typedef sofa::defaulttype::Vector3 Vec3;
-
-    Data<Vector4> cameraIntrinsicParameters;
-    Eigen::Matrix3f rgbIntrinsicMatrix;
-
-    Data<Vec3> cameraPosition;
-    Data<Quat> cameraOrientation;
-
-    Data<int> viewportHeight;
-    Data<int> viewportWidth;
-
-    Data<bool> cameraChanged;
-    double timePCD;
-	
-    VirtualCamera();
-    virtual ~VirtualCamera();
+    MeshProcessingForKalmanFilter();
+    virtual ~MeshProcessingForKalmanFilter();
 
     void init();
+    void bwdInit();
     void handleEvent(sofa::core::objectmodel::Event *event);
-    void setCamera();
-    void draw(const core::visual::VisualParams* vparams) ;
 
+    virtual std::string getTemplateName() const override
+    {
+        return templateName(this);
+    }
 
+    static std::string templateName(const MeshProcessingForKalmanFilter<DataTypes>* = NULL)
+    {
+        return DataTypes::Name();
+    }
 
+    VecCoord getSourcePositions(){ return MeshProcessing<DataTypes>::getSourcePositions(); }
+    VecCoord getSourceVisiblePositions(){ return MeshProcessing<DataTypes>::getSourceVisiblePositions(); }
+    VecCoord getSourceContourPositions(){ return MeshProcessing<DataTypes>::getSourceContourPositions(); }
+    //void setViewPoint() { MeshProcessing<DataTypes>::setViewPoint(); }
 
+    //void updateSourceSurface() { MeshProcessing<DataTypes>::updateSourceSurface(); } // built k-d tree and identify border vertices
+
+    void extractSourceContour() { MeshProcessing<DataTypes>::extractSourceContour(); }
+    void extractSourceVisibleContour() { MeshProcessing<DataTypes>::updateSourceVisibleContour(); }
+    void getSourceVisible(double znear, double zfar);
+    void updateSourceVisible();
+    void updateSourceVisibleContour() { MeshProcessing<DataTypes>::updateSourceVisibleContour(); }
+    void draw(const core::visual::VisualParams* vparams) { MeshProcessing<DataTypes>::draw(vparams); }
+
+    // mask to split between control points and observations points
+    Data<sofa::helper::vector<unsigned int>> d_controlPointsMask;
+    Data<bool> d_controlPointsAreNotExtracted;
 };
 
 
-#if defined(SOFA_EXTERN_TEMPLATE) && !defined(VirtualCamera_CPP)
+#if defined(SOFA_EXTERN_TEMPLATE) && !defined(MeshProcessing_CPP)
 #ifndef SOFA_FLOAT
-extern template class SOFA_RGBDTRACKING_API VirtualCamera<defaulttype::Vec3dTypes>;
+extern template class SOFA_RGBDTRACKING_API MeshProcessingForKalmanFilter<defaulttype::Vec3dTypes>;
 #endif
 #ifndef SOFA_DOUBLE
-extern template class SOFA_RGBDTRACKING_API VirtualCamera<defaulttype::Vec3fTypes>;
+extern template class SOFA_RGBDTRACKING_API MeshProcessingForKalmanFilter<defaulttype::Vec3fTypes>;
 #endif
 #endif
 
@@ -136,4 +108,4 @@ extern template class SOFA_RGBDTRACKING_API VirtualCamera<defaulttype::Vec3fType
 
 } // namespace sofa
 
-#endif
+#endif  // SOFA_RGBDTRACKING_MESHPROCESSING_FORKALMANFILTER_H

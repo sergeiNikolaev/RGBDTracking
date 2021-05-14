@@ -33,7 +33,7 @@
 #include <pcl/common/io.h>
 #include <pcl/features/normal_3d.h>
 #include <pcl/features/principal_curvatures.h>
-#include <pcl/gpu/features/features.hpp>
+//#include <pcl/gpu/features/features.hpp>
 #include "DataSource.hpp"
 
 #include <sofa/helper/gl/Color.h>
@@ -50,6 +50,8 @@
 #include <pcl/features/3dsc.h>
 #include <pcl/features/shot_omp.h>
 #include <pcl/kdtree/kdtree_flann.h>
+
+#include <opencv2/highgui/highgui_c.h>
 
 #include "ImageConverter.h"
 #ifdef Success
@@ -123,13 +125,19 @@ RGBDDataProcessing<DataTypes>::RGBDDataProcessing( )
 	iter_im = 0;
         timeSegmentation = 0;
         timePCD = 0;
-
 }
+
+
+template <class DataTypes> bool RGBDDataProcessing<DataTypes>::destroy = false;
+template <class DataTypes> bool RGBDDataProcessing<DataTypes>::drawing_box = false;
+template <class DataTypes> cv::Rect RGBDDataProcessing<DataTypes>::box = cv::Rect();
+
 
 template <class DataTypes>
 RGBDDataProcessing<DataTypes>::~RGBDDataProcessing()
 {
 }
+
 
 template <class DataTypes>
 void RGBDDataProcessing<DataTypes>::init()
@@ -155,28 +163,25 @@ void RGBDDataProcessing<DataTypes>::init()
         rgbIntrinsicMatrix(0,2) = camParam[2];
         rgbIntrinsicMatrix(1,2) = camParam[3];
 
-        initsegmentation = true;        
-
+        initsegmentation = true;
 }
 
 
-bool g_bDisplay = true;
 
-bool destroy=false;
-cv::Rect box;
-bool drawing_box = false;
-
-void draw_box(cv::Mat _img, cv::Rect rect)
+template <class DataTypes>
+void RGBDDataProcessing<DataTypes>::draw_box(cv::Mat _img, cv::Rect rect)
 {
-  cv::rectangle(_img, cvPoint(box.x, box.y), cvPoint(box.x+box.width,box.y+box.height),
-              cvScalar(0,0,255) ,2);
-
-  cv::Rect rect2=cv::Rect(box.x,box.y,box.width,box.height);
-  //cvSetImageROI(image, rect2);   //here I wanted to set the drawn rect as ROI
+    cv::rectangle(_img, cvPoint(RGBDDataProcessing<DataTypes>::box.x, RGBDDataProcessing<DataTypes>::box.y),
+        cvPoint(RGBDDataProcessing<DataTypes>::box.x+RGBDDataProcessing<DataTypes>::box.width, RGBDDataProcessing<DataTypes>::box.y+RGBDDataProcessing<DataTypes>::box.height), cvScalar(0,0,255), 2);
+    cv::Rect rect2=cv::Rect(RGBDDataProcessing<DataTypes>::box.x, RGBDDataProcessing<DataTypes>::box.y, RGBDDataProcessing<DataTypes>::box.width, RGBDDataProcessing<DataTypes>::box.height);
+    //cvSetImageROI(image, rect2);   //here I wanted to set the drawn rect as ROI
 }
+
+
 
 // Implement mouse callback
-void my_mouse_callback( int event, int x, int y, int flags, void* param )
+template <class DataTypes>
+void RGBDDataProcessing<DataTypes>::my_mouse_callback( int event, int x, int y, int flags, void* param )
 {
   cv::Mat* frame = (cv::Mat*) param;
   
@@ -184,43 +189,43 @@ void my_mouse_callback( int event, int x, int y, int flags, void* param )
   {
       case CV_EVENT_MOUSEMOVE:
       {
-          if( drawing_box )
+          if( RGBDDataProcessing<DataTypes>::drawing_box )
           {
-              box.width = x-box.x;
-              box.height = y-box.y;
+              RGBDDataProcessing<DataTypes>::box.width = x - RGBDDataProcessing<DataTypes>::box.x;
+              RGBDDataProcessing<DataTypes>::box.height = y - RGBDDataProcessing<DataTypes>::box.y;
           }
       }
       break;
 
       case CV_EVENT_LBUTTONDOWN:
       {
-          drawing_box = true;
-          box = cvRect( x, y, 0, 0 );
+          RGBDDataProcessing<DataTypes>::drawing_box = true;
+          RGBDDataProcessing<DataTypes>::box = cvRect( x, y, 0, 0 );
       }
       break;
 
       case CV_EVENT_LBUTTONUP:
       {
-          drawing_box = false;
-          if( box.width < 0 )
+          RGBDDataProcessing<DataTypes>::drawing_box = false;
+          if( RGBDDataProcessing<DataTypes>::box.width < 0 )
           {
-              box.x += box.width;
-              box.width *= -1;
+              RGBDDataProcessing<DataTypes>::box.x += RGBDDataProcessing<DataTypes>::box.width;
+              RGBDDataProcessing<DataTypes>::box.width *= -1;
           }
 
-          if( box.height < 0 )
+          if( RGBDDataProcessing<DataTypes>::box.height < 0 )
           {
-              box.y += box.height;
-              box.height *= -1;
+              RGBDDataProcessing<DataTypes>::box.y += RGBDDataProcessing<DataTypes>::box.height;
+              RGBDDataProcessing<DataTypes>::box.height *= -1;
           }
 
-          draw_box(*frame, box);
+          RGBDDataProcessing<DataTypes>::draw_box(*frame, RGBDDataProcessing<DataTypes>::box);
       }
       break;
 
       case CV_EVENT_RBUTTONUP:
       {
-          destroy=true;
+          RGBDDataProcessing<DataTypes>::destroy = true;
       }
       break;
 
@@ -261,7 +266,7 @@ void RGBDDataProcessing<DataTypes>::initSegmentation()
     //tempm.resize(image.step1());
 	  
     // Set up the callback
-    cv::setMouseCallback(name, my_mouse_callback, (void*) &temp);
+    cv::setMouseCallback(name, RGBDDataProcessing<DataTypes>::my_mouse_callback, (void*) &temp);
 	  
     std::cout << " Time " << (int)this->getContext()->getTime() << std::endl;
 
@@ -274,8 +279,8 @@ void RGBDDataProcessing<DataTypes>::initSegmentation()
       }
 	  temp1 = temp.clone();
 
-      if (drawing_box)
-          draw_box(temp1, box);
+      if (RGBDDataProcessing<DataTypes>::drawing_box)
+          RGBDDataProcessing<DataTypes>::draw_box(temp1, box);
 		  
       cv::moveWindow(name, 200, 100);
       cv::imshow(name, temp1);

@@ -45,6 +45,8 @@
 #include <opencv/cv.h>
 #include <boost/thread.hpp>
 
+#include <Eigen/Dense>
+
 using namespace std;
 using namespace cv;
 

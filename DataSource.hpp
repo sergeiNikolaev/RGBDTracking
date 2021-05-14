@@ -9,7 +9,7 @@
 #include <pcl/common/common.h>
 #include <pcl/features/normal_3d.h>
 #include <pcl/visualization/cloud_viewer.h>
-#include <pcl/gpu/containers/kernel_containers.h>
+//#include <pcl/gpu/containers/kernel_containers.h>
 #include <pcl/search/search.h>
 
 #include <Eigen/StdVector>
@@ -127,9 +127,10 @@ namespace pcl
             void getNeghborsArray(std::vector<int>& data)
             {
                 data.resize(max_nn_size * neighbors_all.size());
-                pcl::gpu::PtrStep<int> ps(&data[0], max_nn_size * sizeof(int));
+                //pcl::PtrStep<int> ps(&data[0], max_nn_size * sizeof(int));
                 for(size_t i = 0; i < neighbors_all.size(); ++i)
-                    copy(neighbors_all[i].begin(), neighbors_all[i].end(), ps.ptr(i));
+                    copy(neighbors_all[i].begin(), neighbors_all[i].end(), data.begin());
+                    //copy(neighbors_all[i].begin(), neighbors_all[i].end(), ps.ptr(i));
             }
 
             void generateSurface()

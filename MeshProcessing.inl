@@ -62,7 +62,7 @@
 #include <pcl/keypoints/sift_keypoint.h>
 #include <pcl/features/normal_3d.h>
 #include <pcl/features/principal_curvatures.h>
-#include <pcl/gpu/features/features.hpp>
+//#include <pcl/gpu/features/features.hpp>
 
 #include <algorithm>    // std::max
 #include "MeshProcessing.h"
