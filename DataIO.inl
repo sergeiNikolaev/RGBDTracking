@@ -457,7 +457,10 @@ void DataIO<DataTypes>::readImages()
         color_3 = color_2.clone();
         color_2 = color.clone();
 
-        readFileToMat0(depth,filename4);
+        std::cout << "We are here" << std::endl;
+
+        depth = cv::imread(filename3);
+        //readFileToMat0(depth,filename4);
         cv::Mat color00;
         depth00 = depth.clone();
         resize(depth00, depth, Size(wdth, hght));

@@ -72,7 +72,7 @@ switch(type){
             mask,   // segmentation result
             rectangle,// rectangle containing foreground
             bgModel,fgModel, // models
-            1,        // number of iterations
+            50,        // number of iterations
             cv::GC_INIT_WITH_RECT); // use rectangle
             // Get the pixels marked as likely foreground
 
@@ -295,7 +295,7 @@ void segmentation::updateSegmentation(cv::Mat &image,cv::Mat &foreground)
     cv::Mat _mask = mask.clone();
     cv::Mat foreground_;
 
-    cv::grabCut(_image,_mask,rectangle,bgModel,fgModel,5,cv::GC_INIT_WITH_MASK);
+    cv::grabCut(_image,_mask,rectangle,bgModel,fgModel,50,cv::GC_INIT_WITH_MASK);
 
     // do something ...
     t = ((double)getTickCount() - t)/getTickFrequency();
