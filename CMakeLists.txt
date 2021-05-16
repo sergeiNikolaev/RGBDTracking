@@ -77,6 +77,9 @@ set(HEADER_FILES
         PointCloudSplitter.h
         PointCloudSplitter.inl
         ModRenderingManager.h
+        RGBDDataProcessingHumanLiver.h
+	RGBDDataProcessingHumanLiver.inl
+        segmentationHumanLiver.h
 )
 
 set(SOURCE_FILES
@@ -103,6 +106,8 @@ set(SOURCE_FILES
         ClosestPointForceFieldForKalmanFilter.cpp
         PointCloudSplitter.cpp
         ModRenderingManager.cpp
+        RGBDDataProcessingHumanLiver.cpp
+        segmentationHumanLiver.cpp
 )
 
 set(README_FILES rgbdtracking.txt)

@@ -5,7 +5,7 @@
  *      Author: apetit
  */
 
-#include "segmentation.h"
+#include "segmentationHumanLiver.h"
 
 #ifdef HAVECUDA
 // Functions from GrabcutUtil.cu
@@ -14,14 +14,14 @@ cudaError_t TrimapFromMask(Npp8u *alpha, int alpha_pitch, Npp8u *dt, int width, 
 cudaError_t ApplyMatte(int mode, uchar4 *result, int result_pitch, const uchar4 *image, int image_pitch, const unsigned char *matte, int matte_pitch, int width, int height);
 #endif
 
-segmentation::segmentation() {
+segmentationHumanLiver::segmentationHumanLiver() {
         // TODO Auto-generated constructor stub
 neighborhood = 8;
 mskt = BBOX;
 type = CVGRAPHCUT;
 }
 
-segmentation::~segmentation() {
+segmentationHumanLiver::~segmentationHumanLiver() {
         // TODO Auto-generated destructor stub
 #ifdef HAVECUDA
 checkCudaErrors(cudaFree(d_image));
@@ -36,7 +36,7 @@ delete cudaseg;
 //delete pbo_resource;
 }
 
-void segmentation::init(int nghb, int impl, int msk)
+void segmentationHumanLiver::init(int nghb, int impl, int msk)
 {
         neighborhood = nghb;
         switch (impl) {
@@ -59,7 +59,7 @@ void segmentation::init(int nghb, int impl, int msk)
         if (type == CVGRAPHCUT) mskt = BBOX;
 }
 
-void segmentation::segmentationFromRect(cv::Mat &image, cv::Mat &foreground)
+void segmentationHumanLiver::segmentationFromRect(cv::Mat &image, cv::Mat &foreground)
 {
 
 switch(type){
@@ -72,7 +72,7 @@ switch(type){
             mask,   // segmentation result
             rectangle,// rectangle containing foreground
             bgModel,fgModel, // models
-            1,        // number of iterations
+            50,        // number of iterations
             cv::GC_INIT_WITH_RECT); // use rectangle
             // Get the pixels marked as likely foreground
 
@@ -207,7 +207,7 @@ switch(type){
         }
 }
 
-void segmentation::updateMask(cv::Mat &foreground)
+void segmentationHumanLiver::updateMask(cv::Mat &foreground)
 {
         switch(mskt){
         case BBOX:
@@ -281,7 +281,7 @@ void segmentation::updateMask(cv::Mat &foreground)
         }
 }
 
-void segmentation::updateSegmentation(cv::Mat &image,cv::Mat &foreground)
+void segmentationHumanLiver::updateSegmentation(cv::Mat &image,cv::Mat &foreground)
 {
 
         switch(type){
@@ -295,7 +295,7 @@ void segmentation::updateSegmentation(cv::Mat &image,cv::Mat &foreground)
     cv::Mat _mask = mask.clone();
     cv::Mat foreground_;
 
-    cv::grabCut(_image,_mask,rectangle,bgModel,fgModel,5,cv::GC_INIT_WITH_MASK);
+    cv::grabCut(_image,_mask,rectangle,bgModel,fgModel,50,cv::GC_INIT_WITH_MASK);
 
     // do something ...
     t = ((double)getTickCount() - t)/getTickFrequency();
@@ -491,7 +491,7 @@ void segmentation::updateSegmentation(cv::Mat &image,cv::Mat &foreground)
 
 }
 
-void segmentation::updateSegmentationCrop(cv::Mat &image,cv::Mat &foreground)
+void segmentationHumanLiver::updateSegmentationCrop(cv::Mat &image,cv::Mat &foreground)
 {
 
         switch(type){
@@ -765,7 +765,7 @@ void segmentation::updateSegmentationCrop(cv::Mat &image,cv::Mat &foreground)
 
 }
 
-void segmentation::saveResult(const char *filename)
+void segmentationHumanLiver::saveResult(const char *filename)
 {
 #ifdef HAVECUDA
         uchar4 *d_result;
@@ -792,7 +792,7 @@ void segmentation::saveResult(const char *filename)
 }
 
 
-void segmentation::getResult(cv::Mat &out)
+void segmentationHumanLiver::getResult(cv::Mat &out)
 {
 #ifdef HAVECUDA
         uchar4 *d_result;
@@ -867,7 +867,7 @@ void segmentation::getResult(cv::Mat &out)
 #endif
 }
 
-void segmentation::getResultCrop(cv::Mat &out)
+void segmentationHumanLiver::getResultCrop(cv::Mat &out)
 {
 #ifdef HAVECUDA
         uchar4 *d_crop_result;
@@ -944,7 +944,7 @@ void segmentation::getResultCrop(cv::Mat &out)
 }
 
 
-void segmentation::filter(cv::Mat &out,cv::Mat &dt,cv::Mat &dot)
+void segmentationHumanLiver::filter(cv::Mat &out,cv::Mat &dt,cv::Mat &dot)
 {
 
 cv::Mat dt0;
@@ -995,7 +995,7 @@ cv::imshow("Canny",edges);*/
 //getchar();
 }
 
-void segmentation::maskFromDt(cv::Mat &_dt,cv::Mat &mask_)
+void segmentationHumanLiver::maskFromDt(cv::Mat &_dt,cv::Mat &mask_)
 {
 
 cv::Mat mask(_dt.size(),CV_8U,cv::Scalar(0));
@@ -1023,7 +1023,7 @@ cv::imshow("Mask",mask_);*/
 
 }
 
-void segmentation::trimapFromDt(cv::Mat &_dt,cv::Mat &dot)
+void segmentationHumanLiver::trimapFromDt(cv::Mat &_dt,cv::Mat &dot)
 {
 
 mask = cv::Mat::zeros(_dt.size(),CV_8U);
@@ -1108,7 +1108,7 @@ cv::imshow("Mask",mask);*/
 
 }
 
-bool segmentation::verifyResult(const char *filename)
+bool segmentationHumanLiver::verifyResult(const char *filename)
 {
 #ifdef HAVECUDA
         uchar4 *d_result;
@@ -1169,7 +1169,7 @@ bool segmentation::verifyResult(const char *filename)
 #endif
 }
 #ifdef HAVECUDA
-FIBITMAP* segmentation::convertCVFree(cv::Mat &in)
+FIBITMAP* segmentationHumanLiver::convertCVFree(cv::Mat &in)
 {
 
         FIBITMAP* out = NULL;
@@ -1202,7 +1202,7 @@ FIBITMAP* segmentation::convertCVFree(cv::Mat &in)
 }
 #endif
 
-void segmentation::clean()
+void segmentationHumanLiver::clean()
 {
 #ifdef HAVECUDA
 delete cudaseg;
