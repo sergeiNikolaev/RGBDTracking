@@ -15,25 +15,24 @@ cudaError_t ApplyMatte(int mode, uchar4 *result, int result_pitch, const uchar4 
 #endif
 
 segmentationHumanLiver::segmentationHumanLiver() {
-        // TODO Auto-generated constructor stub
-neighborhood = 8;
-mskt = BBOX;
-type = CVGRAPHCUT;
+    // TODO Auto-generated constructor stub
+    neighborhood = 8;
+    mskt = BBOX;
+    type = CVGRAPHCUT;
 }
 
 segmentationHumanLiver::~segmentationHumanLiver() {
-        // TODO Auto-generated destructor stub
+    // TODO Auto-generated destructor stub
 #ifdef HAVECUDA
-checkCudaErrors(cudaFree(d_image));
-checkCudaErrors(cudaFree(d_trimap));
-checkCudaErrors(cudaFree(d_dt));
-checkCudaErrors(cudaFree(d_crop_image));
-checkCudaErrors(cudaFree(d_crop_trimap));
-checkCudaErrors(cudaFree(d_crop_dt));
-
-delete cudaseg;
+    checkCudaErrors(cudaFree(d_image));
+    checkCudaErrors(cudaFree(d_trimap));
+    checkCudaErrors(cudaFree(d_dt));
+    checkCudaErrors(cudaFree(d_crop_image));
+    checkCudaErrors(cudaFree(d_crop_trimap));
+    checkCudaErrors(cudaFree(d_crop_dt));
+    delete cudaseg;
 #endif
-//delete pbo_resource;
+    //delete pbo_resource;
 }
 
 void segmentationHumanLiver::init(int nghb, int impl, int msk)
@@ -61,12 +60,10 @@ void segmentationHumanLiver::init(int nghb, int impl, int msk)
 
 void segmentationHumanLiver::segmentationFromRect(cv::Mat &image, cv::Mat &foreground)
 {
+    switch(type) {
 
-switch(type){
         case CVGRAPHCUT:
         {
-
-
             cv::Mat bgModel,fgModel;
             cv::grabCut(image,    // input image
             mask,   // segmentation result
@@ -84,55 +81,53 @@ switch(type){
             // Generate output image
             //cv::Mat foreground(image.size(),CV_8UC3,cv::Scalar(255,255,255));
             image.copyTo(foreground,maskimg); // bg pixels not copied
-                break;
+            break;
         }
+
         case CUDAGRAPHCUT:
         {
-
-    std::cout << " ok cuda found 0" << std::endl;
+            std::cout << " ok cuda found 0" << std::endl;
 
 #ifdef HAVECUDA
+            std::cout << " ok cuda found 1" << std::endl;
+            FIBITMAP* _dib = NULL;
+            FIBITMAP* _dib4 = NULL;
 
-    std::cout << " ok cuda found 1" << std::endl;
-        FIBITMAP* _dib = NULL;
-        FIBITMAP* _dib4 = NULL;
+            if(_dib)  // get rid of the current dib.
+                FreeImage_Unload(_dib);
 
-        if(_dib)  // get rid of the current dib.
-            FreeImage_Unload(_dib);
+            //_dib = convertCVFree(image);
 
-        //_dib = convertCVFree(image);
+            width  = image.size().width;
+            height = image.size().height;
 
-        width  = image.size().width;
-        height = image.size().height;
+            switch(image.type())
+            {
+                case CV_8U  : {_dib = FreeImage_AllocateT(FIT_BITMAP,width, height, 8) ; } break;  // 8  bit grayscale
+                case CV_8UC3: {_dib = FreeImage_AllocateT(FIT_BITMAP,width, height, 24); } break;  // 24 bit RGB
+                case CV_16U : {_dib = FreeImage_AllocateT(FIT_UINT16,width, height, 16); } break;  // 16 bit grayscale
+                case CV_16S : {_dib = FreeImage_AllocateT(FIT_INT16 ,width, height, 16); } break;
+                case CV_32S : {_dib = FreeImage_AllocateT(FIT_INT32 ,width, height, 32); } break;
+                case CV_32F : {_dib = FreeImage_AllocateT(FIT_FLOAT ,width, height, 32); } break;
+                case CV_64F : {_dib = FreeImage_AllocateT(FIT_DOUBLE,width, height, 32); } break;
+            }
 
-        switch(image.type())
-        {
-        case CV_8U  :{_dib = FreeImage_AllocateT(FIT_BITMAP,width, height, 8) ;}break;  // 8  bit grayscale
-        case CV_8UC3:{_dib = FreeImage_AllocateT(FIT_BITMAP,width, height, 24);}break;  // 24 bit RGB
-        case CV_16U :{_dib = FreeImage_AllocateT(FIT_UINT16,width, height, 16);}break;  // 16 bit grayscale
-        case CV_16S :{_dib = FreeImage_AllocateT(FIT_INT16 ,width, height, 16);}break;
-        case CV_32S :{_dib = FreeImage_AllocateT(FIT_INT32 ,width, height, 32);}break;
-        case CV_32F :{_dib = FreeImage_AllocateT(FIT_FLOAT ,width, height, 32);}break;
-        case CV_64F :{_dib = FreeImage_AllocateT(FIT_DOUBLE,width, height, 32);}break;
-        }
+            //if(out==NULL)
+                //return FALSE;
 
-        //if(out==NULL)
-            //return FALSE;
+            int srcRowBytes = width  * image.elemSize();
 
-        int srcRowBytes = width  * image.elemSize();
-
-        for (int ih=0;ih<height;ih++)
-        {
-            BYTE* ptr2Line = FreeImage_GetScanLine(_dib,(height-1)-ih);
-            memcpy(ptr2Line,image.ptr(ih),srcRowBytes);
-        }
+            for (int ih=0;ih<height;ih++)
+            {
+                BYTE* ptr2Line = FreeImage_GetScanLine(_dib,(height-1)-ih);
+                memcpy(ptr2Line,image.ptr(ih),srcRowBytes);
+            }
 
             width = FreeImage_GetWidth(_dib);
             height = FreeImage_GetHeight(_dib);
 
             if (width > MAX_IMAGE_SIZE || height > MAX_IMAGE_SIZE)
             {
-
                 float scale_factor = min(MAX_IMAGE_SIZE / width, MAX_IMAGE_SIZE / height);
 
                 FIBITMAP *pResampled = FreeImage_Rescale(_dib, (int)(scale_factor * width), (int)(scale_factor * height), FILTER_BICUBIC);
@@ -142,10 +137,7 @@ switch(type){
                 _dib4 = FreeImage_ConvertTo32Bits(pResampled);
 
                 FreeImage_Unload(pResampled);
-
-            }
-            else
-            {
+            } else {
                 _dib4 = FreeImage_ConvertTo32Bits(_dib);
             }
 
@@ -204,46 +196,52 @@ switch(type){
             break;
 #endif
         }
-        }
+    }
 }
+
 
 void segmentationHumanLiver::updateMask(cv::Mat &foreground)
 {
-        switch(mskt){
+    switch(mskt) {
+
         case BBOX:
         {
             Point pt;
-                std::vector<cv::Point> ptfgd;
-                ptfgd.resize(0);
+            std::vector<cv::Point> ptfgd;
+            ptfgd.resize(0);
 
-                switch(type){
+            switch(type) {
+
                 case CVGRAPHCUT:
                 {
-            for(int x = 0; x<mask.cols; x++)
-                for(int y = 0; y<mask.rows; y++)
-                        if (mask.at<uchar>(y,x) == 1 || mask.at<uchar>(y,x) == 3)
-                        {
+                    for (int x = 0; x<mask.cols; x++) {
+                        for (int y = 0; y<mask.rows; y++) {
+                            if (mask.at<uchar>(y,x) == 1 || mask.at<uchar>(y,x) == 3) {
                                 pt.x = x;
                                 pt.y = y;
                                 ptfgd.push_back(pt);
-                        }
-                        else if(mask.at<uchar>(y,x) == 0)
+                            } else if (mask.at<uchar>(y,x) == 0) {
                                 mask.at<uchar>(y,x) = 2;
-            break;
+                            }
+                        }
+                    }
+                    break;
                 }
+
                 case CUDAGRAPHCUT:
                 {
-            for(int x = 0; x<mask.cols; x++)
-                for(int y = 0; y<mask.rows; y++)
-                        if (foreground.at<cv::Vec4b>(y,x)[0] > 0 || foreground.at<cv::Vec4b>(y,x)[1] > 0 || foreground.at<cv::Vec4b>(y,x)[2] > 0)
-                        {
+                    for (int x = 0; x<mask.cols; x++) {
+                        for (int y = 0; y<mask.rows; y++) {
+                            if (foreground.at<cv::Vec4b>(y,x)[0] > 0 || foreground.at<cv::Vec4b>(y,x)[1] > 0 || foreground.at<cv::Vec4b>(y,x)[2] > 0) {
                                 pt.x = x;
                                 pt.y = y;
                                 ptfgd.push_back(pt);
+                            }
                         }
-            break;
+                    }
+                    break;
                 }
-                }
+            }
 
             rectangle = cv::boundingRect(ptfgd);
             //std::cout << " ptfgd " << frame_count << " rect1 " << rectangle.x << " " << rectangle.y << " rect2 " << rectangle.width << " " << rectangle.height << std::endl;
@@ -255,204 +253,205 @@ void segmentationHumanLiver::updateMask(cv::Mat &foreground)
 
             std::cout << " rect1 " << rectangle.x << " " << rectangle.y << std::endl;
 
-            for(int x = 0; x<mask.cols; x++)
-                for(int y = 0; y<mask.rows; y++)
-                        if (x < rectangle.x || x > rectangle.x + rectangle.width || y < rectangle.y || y > rectangle.y + rectangle.height)
-                        {
-                                mask.at<uchar>(y,x) = 0;
-                        }
-
-                break;
+            for (int x = 0; x<mask.cols; x++) {
+                for (int y = 0; y<mask.rows; y++) {
+                    if (x < rectangle.x || x > rectangle.x + rectangle.width || y < rectangle.y || y > rectangle.y + rectangle.height) {
+                        mask.at<uchar>(y,x) = 0;
+                    }
+                }
+            }
+            break;
         }
+
         case CONTOUR:
         {
             cv::Mat distanceMap(foreground.size(),CV_8U,cv::Scalar(255));
             cv::Mat dot(foreground.size(),CV_8U,cv::Scalar(0));
             filter(foreground,distanceMap,dot);
-        //maskFromDt(distanceMap,mask1);
+            //maskFromDt(distanceMap,mask1);
             trimapFromDt(distanceMap,dot);
 
-                //std::cout << " rect1 " << rectangle.x << " " << rectangle.y << std::endl;
+            //std::cout << " rect1 " << rectangle.x << " " << rectangle.y << std::endl;
 
-                distImage = distanceMap;
-                dotImage = dot;
+            distImage = distanceMap;
+            dotImage = dot;
             break;
         }
-        }
+    }
+
+    cv::namedWindow("Mask");
+    cv::imshow("Mask", mask);
 }
+
+
 
 void segmentationHumanLiver::updateSegmentation(cv::Mat &image,cv::Mat &foreground)
 {
+    switch(type) {
 
-        switch(type){
         case CVGRAPHCUT:
         {
-    double t = (double)getTickCount();
+            double t = (double)getTickCount();
 
-    cv::Mat bgModel,fgModel;
+            cv::Mat bgModel,fgModel;
+            cv::Mat _image = image.clone();
+            cv::Mat _mask = mask.clone();
+            cv::Mat foreground_;
 
-    cv::Mat _image = image.clone();
-    cv::Mat _mask = mask.clone();
-    cv::Mat foreground_;
+            cv::grabCut(_image,_mask,rectangle,bgModel,fgModel,50,cv::GC_INIT_WITH_MASK);
 
-    cv::grabCut(_image,_mask,rectangle,bgModel,fgModel,50,cv::GC_INIT_WITH_MASK);
+            // do something ...
+            t = ((double)getTickCount() - t)/getTickFrequency();
+            cout << "Times passed in seconds: " << t << endl;
 
-    // do something ...
-    t = ((double)getTickCount() - t)/getTickFrequency();
-    cout << "Times passed in seconds: " << t << endl;
+            //std::cout << " mask " << mask << std::endl;
+            cv::compare(_mask,cv::GC_PR_FGD,maskimg,cv::CMP_EQ);
+            // Generate output image
+            //cv::Mat foreground(image.size(),CV_8UC3,cv::Scalar(255,255,255));
+            _image.copyTo(foreground_,maskimg); // bg pixels not copied
+            cv::Mat alpha(image.size(),CV_8UC1,Scalar(0));
 
-    //std::cout << " mask " << mask << std::endl;
-    cv::compare(_mask,cv::GC_PR_FGD,maskimg,cv::CMP_EQ);
-    // Generate output image
-    //cv::Mat foreground(image.size(),CV_8UC3,cv::Scalar(255,255,255));
-    _image.copyTo(foreground_,maskimg); // bg pixels not copied
-    cv::Mat alpha(image.size(),CV_8UC1,Scalar(0));
+            for (int x = 0; x<image.cols; x++) {
+                for (int y = 0; y<image.rows; y++) {
+                    if (foreground_.at<cv::Vec3b>(y,x)[0] == 0 && foreground_.at<cv::Vec3b>(y,x)[1] == 0 && foreground_.at<cv::Vec3b>(y,x)[2] == 0) {
+                        alpha.at<uchar>(y,x) = 0;
+                    } else {
+                        alpha.at<uchar>(y,x) = 255;
+                    }
+                }
+            }
 
-    for(int x = 0; x<image.cols; x++)
-        for(int y = 0; y<image.rows; y++){
-                if (foreground_.at<cv::Vec3b>(y,x)[0] == 0 && foreground_.at<cv::Vec3b>(y,x)[1] == 0 && foreground_.at<cv::Vec3b>(y,x)[2] == 0)
-                      alpha.at<uchar>(y,x) = 0;
-                else alpha.at<uchar>(y,x) = 255;
+            cv::Mat rgb[4];
+            cv::split(foreground_,rgb);
+
+            cv::Mat rgba[4]={rgb[0],rgb[1],rgb[2],alpha};
+            cv::merge(rgba,4,foreground_);
+            foreground = foreground_.clone();
+
+            break;
         }
 
-    cv::Mat rgb[4];
-    cv::split(foreground_,rgb);
-
-    cv::Mat rgba[4]={rgb[0],rgb[1],rgb[2],alpha};
-    cv::merge(rgba,4,foreground_);
-    foreground = foreground_.clone();
-
-        break;
-        }
         case CUDAGRAPHCUT:
         {
 #ifdef HAVECUDA
-    double t = (double)getTickCount();
+            double t = (double)getTickCount();
 
-        FIBITMAP* _dib = NULL;
-        FIBITMAP* _dib4 = NULL;
+            FIBITMAP* _dib = NULL;
+            FIBITMAP* _dib4 = NULL;
 
-        if(_dib)  // get rid of the current dib.
-            FreeImage_Unload(_dib);
+            if(_dib)  // get rid of the current dib.
+                FreeImage_Unload(_dib);
 
-        //_dib = convertCVFree(image);
+            //_dib = convertCVFree(image);
 
-        width  = image.size().width;
-        height = image.size().height;
+            width  = image.size().width;
+            height = image.size().height;
 
-        switch(image.type())
-        {
-        case CV_8U  :{_dib = FreeImage_AllocateT(FIT_BITMAP,width, height, 8) ;}break;  // 8  bit grayscale
-        case CV_8UC3:{_dib = FreeImage_AllocateT(FIT_BITMAP,width, height, 24);}break;  // 24 bit RGB
-        case CV_16U :{_dib = FreeImage_AllocateT(FIT_UINT16,width, height, 16);}break;  // 16 bit grayscale
-        case CV_16S :{_dib = FreeImage_AllocateT(FIT_INT16 ,width, height, 16);}break;
-        case CV_32S :{_dib = FreeImage_AllocateT(FIT_INT32 ,width, height, 32);}break;
-        case CV_32F :{_dib = FreeImage_AllocateT(FIT_FLOAT ,width, height, 32);}break;
-        case CV_64F :{_dib = FreeImage_AllocateT(FIT_DOUBLE,width, height, 32);}break;
-        }
+            switch(image.type())
+            {
+                case CV_8U  : {_dib = FreeImage_AllocateT(FIT_BITMAP,width, height, 8) ;} break;  // 8  bit grayscale
+                case CV_8UC3: {_dib = FreeImage_AllocateT(FIT_BITMAP,width, height, 24);} break;  // 24 bit RGB
+                case CV_16U : {_dib = FreeImage_AllocateT(FIT_UINT16,width, height, 16);} break;  // 16 bit grayscale
+                case CV_16S : {_dib = FreeImage_AllocateT(FIT_INT16 ,width, height, 16);} break;
+                case CV_32S : {_dib = FreeImage_AllocateT(FIT_INT32 ,width, height, 32);} break;
+                case CV_32F : {_dib = FreeImage_AllocateT(FIT_FLOAT ,width, height, 32);} break;
+                case CV_64F : {_dib = FreeImage_AllocateT(FIT_DOUBLE,width, height, 32);} break;
+            }
 
+            //if(out==NULL)
+                //return FALSE;
 
-        //if(out==NULL)
-            //return FALSE;
+            int srcRowBytes = width  * image.elemSize();
 
-        int srcRowBytes = width  * image.elemSize();
+            for (int ih=0;ih<height;ih++)
+            {
+                BYTE* ptr2Line = FreeImage_GetScanLine(_dib,(height-1)-ih);
+                memcpy(ptr2Line,image.ptr(ih),srcRowBytes);
+            }
 
-        for (int ih=0;ih<height;ih++)
-        {
-            BYTE* ptr2Line = FreeImage_GetScanLine(_dib,(height-1)-ih);
-            memcpy(ptr2Line,image.ptr(ih),srcRowBytes);
-        }
+            width = FreeImage_GetWidth(_dib);
+            height = FreeImage_GetHeight(_dib);
 
-    width = FreeImage_GetWidth(_dib);
-    height = FreeImage_GetHeight(_dib);
+            if (width > MAX_IMAGE_SIZE || height > MAX_IMAGE_SIZE)
+            {
+                float scale_factor = min(MAX_IMAGE_SIZE / width, MAX_IMAGE_SIZE / height);
 
+                FIBITMAP *pResampled = FreeImage_Rescale(_dib, (int)(scale_factor * width), (int)(scale_factor * height), FILTER_BICUBIC);
+                width = FreeImage_GetWidth(pResampled);
+                height = FreeImage_GetHeight(pResampled);
 
-    if (width > MAX_IMAGE_SIZE || height > MAX_IMAGE_SIZE)
-    {
+                _dib4 = FreeImage_ConvertTo32Bits(pResampled);
 
-        float scale_factor = min(MAX_IMAGE_SIZE / width, MAX_IMAGE_SIZE / height);
+                FreeImage_Unload(pResampled);
+            } else {
+                _dib4 = FreeImage_ConvertTo32Bits(_dib);
+            }
 
-        FIBITMAP *pResampled = FreeImage_Rescale(_dib, (int)(scale_factor * width), (int)(scale_factor * height), FILTER_BICUBIC);
-        width = FreeImage_GetWidth(pResampled);
-        height = FreeImage_GetHeight(pResampled);
+            /*if (!g_bQATest && g_bDisplay)
+            {
+                initGL(&argc, argv, width, height);
+            }*/
 
-        _dib4 = FreeImage_ConvertTo32Bits(pResampled);
+            //std::cout << " width " << width << " height " << height << std::endl;
 
-        FreeImage_Unload(pResampled);
-
-    }
-    else
-    {
-        _dib4 = FreeImage_ConvertTo32Bits(_dib);
-    }
-
-    /*if (!g_bQATest && g_bDisplay)
-    {
-        initGL(&argc, argv, width, height);
-    }*/
-
-    //std::cout << " width " << width << " height " << height << std::endl;
-
-    checkCudaErrors(cudaMallocPitch(&d_image, &image_pitch, width * sizeof(uchar4), height));
-    checkCudaErrors(cudaMemcpy2D(d_image, image_pitch, FreeImage_GetBits(_dib4) , FreeImage_GetPitch(_dib4), width * sizeof(uchar4), height, cudaMemcpyHostToDevice));
+            checkCudaErrors(cudaMallocPitch(&d_image, &image_pitch, width * sizeof(uchar4), height));
+            checkCudaErrors(cudaMemcpy2D(d_image, image_pitch, FreeImage_GetBits(_dib4) , FreeImage_GetPitch(_dib4), width * sizeof(uchar4), height, cudaMemcpyHostToDevice));
 
             FreeImage_Unload(_dib);
             FreeImage_Unload(_dib4);
 
             checkCudaErrors(cudaMallocPitch(&d_trimap, &trimap_pitch, width, height));
 
-                switch(mskt){
+            switch(mskt){
                 case BBOX:
                 {
+                    rect.x = rectangle.x;
+                    rect.y = rectangle.y;
+                    rect.width = rectangle.width;
+                    rect.height = rectangle.height;
 
-            rect.x = rectangle.x;
-            rect.y = rectangle.y;
-            rect.width = rectangle.width;
-            rect.height = rectangle.height;
-
-            //checkCudaErrors(TrimapFromMask(d_trimap, (int) trimap_pitch, d_dt, width, height));
-            checkCudaErrors(TrimapFromRect(d_trimap, (int) trimap_pitch, rect, width, height));
-            cudaseg->updateTrimap(d_trimap);
-            break;
+                    //checkCudaErrors(TrimapFromMask(d_trimap, (int) trimap_pitch, d_dt, width, height));
+                    checkCudaErrors(TrimapFromRect(d_trimap, (int) trimap_pitch, rect, width, height));
+                    cudaseg->updateTrimap(d_trimap);
+                    break;
                 }
+
                 case CONTOUR:
                 {
-            //FIBITMAP *h_tri = FreeImage_Allocate(width, height, 8);
+                    //FIBITMAP *h_tri = FreeImage_Allocate(width, height, 8);
+                    //checkCudaErrors(cudaMemcpy2D(FreeImage_GetBits(h_tri) , FreeImage_GetPitch(h_tri), d_trimap, trimap_pitch, width, height, cudaMemcpyDeviceToHost));
+                    //checkCudaErrors(cudaMemcpy2D(d_trimap, trimap_pitch, FreeImage_GetBits(tri) , FreeImage_GetPitch(tri), width * sizeof(uchar), height, cudaMemcpyDeviceToHost));
 
-            //checkCudaErrors(cudaMemcpy2D(FreeImage_GetBits(h_tri) , FreeImage_GetPitch(h_tri), d_trimap, trimap_pitch, width, height, cudaMemcpyDeviceToHost));
+                    FIBITMAP* _distanceMap = NULL;
 
-            //checkCudaErrors(cudaMemcpy2D(d_trimap, trimap_pitch, FreeImage_GetBits(tri) , FreeImage_GetPitch(tri), width * sizeof(uchar), height, cudaMemcpyDeviceToHost));
+                    if(_distanceMap)  // get rid of the current dib.
+                        FreeImage_Unload(_distanceMap);
 
-        FIBITMAP* _distanceMap = NULL;
+                    _distanceMap = convertCVFree(mask);
 
-        if(_distanceMap)  // get rid of the current dib.
-            FreeImage_Unload(_distanceMap);
+                    size_t dt_pitch;
 
-        _distanceMap = convertCVFree(mask);
+                    checkCudaErrors(cudaMallocPitch(&d_dt, &dt_pitch, width * sizeof(uchar), height));
+                    checkCudaErrors(cudaMemcpy2D(d_dt, dt_pitch, FreeImage_GetBits(_distanceMap) , FreeImage_GetPitch(_distanceMap), width * sizeof(uchar), height, cudaMemcpyHostToDevice));
 
-        size_t dt_pitch;
+                    cudaseg->updateTrimap(d_dt);
 
-            checkCudaErrors(cudaMallocPitch(&d_dt, &dt_pitch, width * sizeof(uchar), height));
-            checkCudaErrors(cudaMemcpy2D(d_dt, dt_pitch, FreeImage_GetBits(_distanceMap) , FreeImage_GetPitch(_distanceMap), width * sizeof(uchar), height, cudaMemcpyHostToDevice));
+                    //FreeImage_Unload(h_tri);
 
-            cudaseg->updateTrimap(d_dt);
-
-            //FreeImage_Unload(h_tri);
-
-            FreeImage_Unload(_distanceMap);
-            break;
+                    FreeImage_Unload(_distanceMap);
+                    break;
                 }
-                }
+            }
 
             checkCudaErrors(cudaFree(d_dt));
 
             //cudaseg->computeSegmentationFromTrimap();
-        cudaseg->updateImage(d_image);
+            cudaseg->updateImage(d_image);
 
             // Setup GrabCut
             //cudaseg = new cudaSegmentation(d_image, (int) image_pitch, d_trimap, (int) trimap_pitch, width, height);
 
-        //cudaseg->computeSegmentationFromTrimap();
+            //cudaseg->computeSegmentationFromTrimap();
             cudaseg->updateSegmentation();
 
             /*if (!g_bQATest && g_bDisplay)
@@ -472,7 +471,7 @@ void segmentationHumanLiver::updateSegmentation(cv::Mat &image,cv::Mat &foregrou
 
             //cv::imwrite("foreground01.png", foreground.clone());
 
-         //waitKey(0);
+            //waitKey(0);
             //getchar();
 
 
@@ -486,10 +485,11 @@ void segmentationHumanLiver::updateSegmentation(cv::Mat &image,cv::Mat &foregrou
             cout << "Times passed in seconds : " << t << endl;
             break;
 #endif
-                }
         }
-
+    }
 }
+
+
 
 void segmentationHumanLiver::updateSegmentationCrop(cv::Mat &image,cv::Mat &foreground)
 {
